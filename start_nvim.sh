@@ -1,0 +1,1 @@
+nvim -u ./minit.lua

@@ -16,3 +16,4 @@ To see which plugins are deprecated.
 
 ## TODOs
 [ ] Export options for progress bar UI.
+[ ] Fetch from origin automatically.

@@ -13,3 +13,6 @@ To see which plugins are deprecated.
 3. Compose a list of all plugins and sort them lively while retrieving the info of the remaining plugins.
 4. Display them on a floating window. Expand one item for more details.
 5. Cache the result.
+
+## TODOs
+[ ] Export options for progress bar UI.

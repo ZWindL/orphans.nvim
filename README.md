@@ -1,4 +1,4 @@
-# <WIP> orphan.nvim
+# <WIP> orphans.nvim
 To see which plugins are deprecated.
 
 ## Features

@@ -50,6 +50,7 @@ end
 M.setup = function(opts)
     -- Create a command `:Orphan`
     vim.api.nvim_create_user_command("Orphans", function()
+        M.display_plugins()
     end, {})
 end
 

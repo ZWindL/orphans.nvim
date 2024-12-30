@@ -1,4 +1,4 @@
-# <WIP> orphans.nvim
+# \<WIP\> orphans.nvim
 To see which plugins are deprecated.
 
 ## Features
@@ -15,10 +15,10 @@ To see which plugins are deprecated.
 5. Cache the result.
 
 ## TODOs
-[ ] Cache results.
-[ ] Export options for progress bar UI.
-[ ] Fetch from origin automatically.
-[ ] Ignore certain plugins.
-[ ] Sort by name/commit time.
-[ ] Floating window backdrop. https://github.com/folke/lazy.nvim/blob/main/lua/lazy/view/float.lua#L143
-[ ] Auto resize. https://github.com/folke/lazy.nvim/blob/main/lua/lazy/view/float.lua#L190
+- [ ] Cache results.
+- [ ] Export options for progress bar UI.
+- [ ] Fetch from origin automatically.
+- [ ] Ignore certain plugins.
+- [ ] Sort by name/commit time.
+- [ ] Floating window backdrop. https://github.com/folke/lazy.nvim/blob/main/lua/lazy/view/float.lua#L143
+- [ ] Auto resize. https://github.com/folke/lazy.nvim/blob/main/lua/lazy/view/float.lua#L190

@@ -1,5 +1,5 @@
-local Opt = require("orphan.config").options
-local Git = require("orphan.git")
+local Opt = require("orphans.config").options
+local Git = require("orphans.git")
 local api = vim.api
 
 local P = {
@@ -14,7 +14,13 @@ end
 
 function P.sort_by_last_commit(plugins)
     table.sort(plugins, function(a, b)
-        return a.last_commit_time > b.last_commit_time
+        return a.last_commit_time < b.last_commit_time
+    end)
+end
+
+function P.sort_by_name(plugins)
+    table.sort(plugins, function(a, b)
+        return a.name > b.name
     end)
 end
 
@@ -38,15 +44,20 @@ local function format_delta(time)
     if delta < 60 then
         return "just now"
     elseif delta < 60 * 60 then
-        return math.floor(delta / 60) .. " minutes ago"
+        local minutes = math.floor(delta / 60)
+        return minutes .. " minute" .. (minutes ~= 1 and "s" or "") .. " ago"
     elseif delta < 60 * 60 * 24 then
-        return math.floor(delta / (60 * 60)) .. " hours ago"
+        local hours = math.floor(delta / (60 * 60))
+        return hours .. " hour" .. (hours ~= 1 and "s" or "") .. " ago"
     elseif delta < 60 * 60 * 24 * 30 then
-        return math.floor(delta / (60 * 60 * 24)) .. " days ago"
+        local days = math.floor(delta / (60 * 60 * 24))
+        return days .. " day" .. (days ~= 1 and "s" or "") .. " ago"
     elseif delta < 60 * 60 * 24 * 365 then
-        return math.floor(delta / (60 * 60 * 24 * 30)) .. " months ago"
+       local months = math.floor(delta / (60 * 60 * 24 * 30))
+       return months .. " month" .. (months ~= 1 and "s" or "") .. " ago"
     else
-        return math.floor(delta / (60 * 60 * 24 * 365)) .. " years ago"
+        local years = math.floor(delta / (60 * 60 * 24 * 365))
+        return years .. " year" .. (years ~= 1 and "s" or "") .. " ago"
     end
 end
 
@@ -58,19 +69,24 @@ P.new_plugin = function()
         last_commit_time_str = "",
         last_commit_time_delta = "",
         last_commit_msg = "",
-        repo_url = "",
+        -- repo_url = "", --TODO: show repo url
     }
 end
 
 P.new_plugin_async = function(path, callback)
     local plugin = P.new_plugin()
-    Git.last_commit_time_async(path, function(t)
+    Git.last_commit_info_async(path, function(info)
+        -- split info by newline, first line is timestamp, second line is commit message
+        local t = info:match("^(%d+)\n")
+        -- the rest is the commit message, trim the newline
+        local msg = info:match("\n(.*)"):gsub("\n", " ")
         t = tonumber(t)
         plugin.path = path
         plugin.name = vim.fn.fnamemodify(path, ":t")
         plugin.last_commit_time = t
         plugin.last_commit_time_str = os.date(Opt.ui.date_format, t)
         plugin.last_commit_time_delta = format_delta(t)
+        plugin.last_commit_msg = msg
         vim.schedule(function()
             callback(plugin)
         end)

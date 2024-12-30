@@ -6,11 +6,10 @@ git.is_git_dir = function(path)
 end
 
 -- query the last commit time of a path
-git.last_commit_time_async = function(path, callback)
-    -- it returns a timestamp like `1734691156`
-    -- TODO: consider return more info like commit message based on options
+git.last_commit_info_async = function(path, callback)
+    -- it returns a timestamp and a commit message like `1734691156\nmessage`
     vim.system(
-        { "git", "log", "-1", "--format=%ct ", path },
+        { "git", "log", "-1", "--format=%ct%n%s ", path },
         { cwd = path },
         function(rst)
             --TODO: handle error

@@ -60,6 +60,7 @@ local M = {
     },
     _help_header = {
         "",
+        " This only shows loaded plugins ",
         string.format("%-15s %-20s %s", "<q>: Close", "<?>: Toggle Help", "<C-u>/<C-d>: Half Page Up/Down"),
         "",
     },

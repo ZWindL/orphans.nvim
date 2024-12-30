@@ -26,13 +26,14 @@ M.display_plugins = function()
         ld:close()
     end
 
+    ld:show()
+
     for _, dir in ipairs(dirs) do
         if git.is_git_dir(dir) then
             Plugins.new_plugin_async(dir, function(p)
                 table.insert(plugins, p)
                 processed_count = processed_count + 1
                 ld:render(math.floor((processed_count / total) * 100))
-
                 if processed_count == total then
                     sort_and_open_dashboard()
                 end

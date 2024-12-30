@@ -128,7 +128,7 @@ local function format_plugin(plugin)
 end
 
 local function table_concat(t1, t2)
-    local t = {table.unpack(t1)}
+    local t = vim.deepcopy(t1, true)
     for _, v in ipairs(t2) do
         table.insert(t, v)
     end

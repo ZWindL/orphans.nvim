@@ -29,7 +29,7 @@ M.display_plugins = function()
     ld:show()
 
     for _, dir in ipairs(dirs) do
-        if git.is_git_dir(dir) then
+        if Plugins.is_plugin(dir) then
             Plugins.new_plugin_async(dir, function(p)
                 table.insert(plugins, p)
                 processed_count = processed_count + 1

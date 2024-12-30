@@ -28,6 +28,9 @@ end
 -- serialize to json
 
 P.is_plugin = function(path)
+    if path == vim.fn.stdpath("config") then
+        return false
+    end
     return Git.is_git_dir(path) and
         (
             vim.fn.isdirectory(path .. "/plugin") == 1 or

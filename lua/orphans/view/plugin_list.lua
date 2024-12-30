@@ -148,11 +148,11 @@ local function format_plugin_table(plugins)
 end
 
 function M:_render(contents)
-    api.nvim_set_option_value("modifiable", true, { scope = "local", buf = self.buf_id })
+    api.nvim_set_option_value("modifiable", true, { buf = self.buf_id })
     api.nvim_buf_set_lines(self.buf_id, 0, -1, false, {})
     api.nvim_buf_set_lines(self.buf_id, 0, -1, false, contents)
-    api.nvim_set_option_value("modifiable", false, { scope = "local", buf = self.buf_id })
-    api.nvim_set_option_value("modified", false, { scope = "local", buf = self.buf_id })
+    api.nvim_set_option_value("modifiable", false, { buf = self.buf_id })
+    api.nvim_set_option_value("modified", false, { buf = self.buf_id })
 end
 
 function M:render_plugins()

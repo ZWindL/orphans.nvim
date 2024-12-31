@@ -12,9 +12,15 @@ git.last_commit_info_async = function(path, callback)
         { "git", "log", "-1", "--format=%ct%n%s ", path },
         { cwd = path },
         function(rst)
-            --TODO: handle error
             if rst.code ~= 0 then
-                callback(nil)
+                -- for plugins don't have any commit yet, ignore them, just return
+                -- callback(nil)
+                vim.notify(
+                    string.format("warning: failed to get the last commit info from %s", path),
+                    vim.log.levels.WARN,
+                    { title = "Orphans.nvim" }
+                )
+                return
             end
             callback(rst.stdout)
         end

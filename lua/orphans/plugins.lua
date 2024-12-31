@@ -1,4 +1,3 @@
-local Opt = require("orphans.config").options
 local Git = require("orphans.git")
 local api = vim.api
 
@@ -76,7 +75,7 @@ P.new_plugin = function()
     }
 end
 
-P.new_plugin_async = function(path, callback)
+P.new_plugin_async = function(path, opts, callback)
     local plugin = P.new_plugin()
     Git.last_commit_info_async(path, function(info)
         -- split info by newline, first line is timestamp, second line is commit message
@@ -87,7 +86,7 @@ P.new_plugin_async = function(path, callback)
         plugin.path = path
         plugin.name = vim.fn.fnamemodify(path, ":t")
         plugin.last_commit_time = t
-        plugin.last_commit_time_str = os.date(Opt.ui.date_format, t)
+        plugin.last_commit_time_str = os.date(opts.ui.date_format, t)
         plugin.last_commit_time_delta = format_delta(t)
         plugin.last_commit_msg = msg
         vim.schedule(function()

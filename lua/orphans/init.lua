@@ -1,11 +1,11 @@
-local git = require("orphans.git")
+local Config = require("orphans.config")
 local Plugins = require("orphans.plugins")
 local Loading = require("orphans.view.loading")
 local List = require("orphans.view.plugin_list")
 
 local M = {}
 
-M.display_plugins = function()
+M.display_plugins = function(opts)
     local ld = Loading:new()
     local list = List:new()
     local dirs = Plugins.all_possible_plugin_dirs()
@@ -22,15 +22,15 @@ M.display_plugins = function()
 
     local function sort_and_open_dashboard()
         Plugins.sort_by_last_commit(plugins)
-        list:setup(plugins, {})
+        list:setup(plugins, opts)
         ld:close()
     end
 
-    ld:show()
+    ld:show(opts)
 
     for _, dir in ipairs(dirs) do
         if Plugins.is_plugin(dir) then
-            Plugins.new_plugin_async(dir, function(p)
+            Plugins.new_plugin_async(dir, opts, function(p)
                 table.insert(plugins, p)
                 processed_count = processed_count + 1
                 ld:render(math.floor((processed_count / total) * 100))
@@ -49,9 +49,11 @@ M.display_plugins = function()
 end
 
 M.setup = function(opts)
+    -- Merge user options
+    opts = Config.setup(opts)
     -- Create a command `:Orphan`
     vim.api.nvim_create_user_command("Orphans", function()
-        M.display_plugins()
+        M.display_plugins(opts)
     end, {})
 end
 

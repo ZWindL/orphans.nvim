@@ -24,7 +24,7 @@ function loading:new()
     return o
 end
 
-function loading:show()
+function loading:show(opts)
     if self.win_nr and api.nvim_win_is_valid(self.win_nr) then
         return
     end
@@ -43,6 +43,11 @@ function loading:show()
     -- show the floating window
     self.buf_nr = api.nvim_create_buf(false, true)
     self.win_nr = api.nvim_open_win(self.buf_nr, false, self.config)
+
+    -- set filetype for loading window
+    if opts.filetype then
+        vim.bo[self.buf_nr].filetype = opts.filetype
+    end
 end
 
 function loading:render(value)

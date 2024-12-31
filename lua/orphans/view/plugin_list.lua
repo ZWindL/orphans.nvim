@@ -74,9 +74,12 @@ function M:new()
 end
 
 -- init the floating window
-function M:_layout()
+function M:_layout(opts)
     if not self.buf_id or not api.nvim_buf_is_valid(self.buf_id) then
         self.buf_id = api.nvim_create_buf(false, true)
+        if opts.filetype then
+            vim.bo[self.buf_id].filetype = opts.filetype
+        end
     end
     if not self.win_id or not api.nvim_win_is_valid(self.win_id) then
         self.win_id = api.nvim_open_win(self.buf_id, true, self.config)
@@ -149,11 +152,10 @@ local function format_plugin_table(plugins)
 end
 
 function M:_render(contents)
-    api.nvim_set_option_value("modifiable", true, { buf = self.buf_id })
-    api.nvim_buf_set_lines(self.buf_id, 0, -1, false, {})
+    vim.bo[self.buf_id].modifiable = true
     api.nvim_buf_set_lines(self.buf_id, 0, -1, false, contents)
-    api.nvim_set_option_value("modifiable", false, { buf = self.buf_id })
-    api.nvim_set_option_value("modified", false, { buf = self.buf_id })
+    vim.bo[self.buf_id].modifiable = false
+    vim.bo[self.buf_id].modified = false
 end
 
 function M:render_plugins()
@@ -195,7 +197,7 @@ function M:setup_keybindings()
 end
 
 function M:setup(plugins, opts)
-    self:_layout()
+    self:_layout(opts)
     if #self._plugins == 0 then
         self._plugins = format_plugin_table(plugins)
     end

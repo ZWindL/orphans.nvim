@@ -22,9 +22,6 @@ require("lazy").setup({
                 require("orphans").setup()
             end
         },
-	{
-	    dir = "/home/zwindl/test/matrix",
-	},
     },
     dev = {
         path = "./",

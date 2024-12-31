@@ -31,7 +31,9 @@ M.display_plugins = function(opts)
     for _, dir in ipairs(dirs) do
         if Plugins.is_plugin(dir) then
             Plugins.new_plugin_async(dir, opts, function(p)
-                table.insert(plugins, p)
+                if p ~= nil then
+                    table.insert(plugins, p)
+                end
                 processed_count = processed_count + 1
                 ld:render(math.floor((processed_count / total) * 100))
                 if processed_count == total then

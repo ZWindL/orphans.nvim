@@ -78,6 +78,12 @@ end
 P.new_plugin_async = function(path, opts, callback)
     local plugin = P.new_plugin()
     Git.last_commit_info_async(path, function(info)
+        if info == nil then
+            vim.schedule(function()
+                callback(nil)
+            end)
+            return
+        end
         -- split info by newline, first line is timestamp, second line is commit message
         local t = info:match("^(%d+)\n")
         -- the rest is the commit message, trim the newline

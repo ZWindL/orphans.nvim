@@ -9,6 +9,7 @@ C.defaults = {
         date_format = "%Y-%m-%d",
     },
     filetype = "orphans",   -- the filetype for the floating window
+    debug = false,
 }
 
 ---Merged options
@@ -17,11 +18,14 @@ C._opts = {}
 
 ---Validate user options
 ---@return boolean
-C.validate = function ()
-    local options = C._opts
+C.validate = function (opts)
     assert(
-        type(options.ui.date_format) == "string",
+        type(opts.ui.date_format) == "string",
         "options.ui.date_format must be a string"
+    )
+    assert(
+        type(opts.debug) == "boolean",
+        "options.debug must be a boolean"
     )
     return true
 end
@@ -39,10 +43,11 @@ end
 C.setup = function(opts)
     local user_opts = opts or {}
     local options = C.merge_config(user_opts)
-    C.validate()
-    -- put debug in `_G`
-    -- TODO: that doesn't work
-    -- _G.plug_toggler.debug = options.debug
+    C.validate(options)
+    -- put every opts in `_G` might be a bad idea
+    -- put only `orphans.debug` in `_G`
+    _G.orphans = {}
+    _G.orphans.debug = options.debug
     return options
 end
 

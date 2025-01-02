@@ -19,6 +19,7 @@
 -- [ ] better keybinding logic
 -- [ ] options
 
+local Utils = require("orphans.utils")
 local api = vim.api
 
 local M = {
@@ -131,14 +132,6 @@ local function format_plugin(plugin)
     return string.format("%-32s │ %-15s │ %-10s: %-42s", name, last_update, last_commit_time, last_commit_msg)
 end
 
-local function table_concat(t1, t2)
-    local t = vim.deepcopy(t1, true)
-    for _, v in ipairs(t2) do
-        table.insert(t, v)
-    end
-    return t
-end
-
 local function format_plugin_table(plugins)
     local t = {}
     -- format header
@@ -166,7 +159,7 @@ function M:render_plugins()
         return
     end
     self._state.page = "plugins"
-    local contents = table_concat(self._help_header, self._plugins)
+    local contents = Utils.table_concat(self._help_header, self._plugins)
     self:_render(contents)
     vim.wo[self.win_id].cursorline = true
 end
@@ -179,7 +172,7 @@ function M:render_help()
         return
     end
     self._state.page = "help"
-    local contents = table_concat(self._help_header, self._help)
+    local contents = Utils.table_concat(self._help_header, self._help)
     self:_render(contents)
 end
 

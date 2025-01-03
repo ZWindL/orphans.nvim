@@ -8,7 +8,8 @@ C.defaults = {
     ui = {
         date_format = "%Y-%m-%d",
     },
-    filetype = "orphans",   -- the filetype for the floating window
+    filetype = "orphans",       -- the filetype for the floating window
+    analyzing_timeout = 2000,   -- the timeout for the analysis for each plugin in ms
     debug = false,
 }
 

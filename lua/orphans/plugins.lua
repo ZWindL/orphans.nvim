@@ -1,4 +1,5 @@
 local Git = require("orphans.git")
+local Utils = require("orphans.utils")
 local api = vim.api
 
 local P = {
@@ -78,19 +79,22 @@ end
 P.new_plugin_async = function(path, opts, callback)
     local plugin = P.new_plugin()
     Git.last_commit_info_async(path, function(info)
+        Utils.log.debug(string.format("last commit info for %s: %s", path, info))
         if info == nil then
+            Utils.log.debug("failed to get last commit info for " .. path .. ", calling cb with nil")
             vim.schedule(function()
                 callback(nil)
             end)
             return
         end
+        plugin.path = path
+        plugin.name = vim.fn.fnamemodify(path, ":t")
+        Utils.log.debug(string.format("analyzing %s: %s", plugin.name, path))
         -- split info by newline, first line is timestamp, second line is commit message
         local t = info:match("^(%d+)\n")
         -- the rest is the commit message, trim the newline
         local msg = info:match("\n(.*)"):gsub("\n", " ")
         t = tonumber(t)
-        plugin.path = path
-        plugin.name = vim.fn.fnamemodify(path, ":t")
         plugin.last_commit_time = t
         plugin.last_commit_time_str = os.date(opts.ui.date_format, t)
         plugin.last_commit_time_delta = format_delta(t)

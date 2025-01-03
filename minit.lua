@@ -19,7 +19,9 @@ require("lazy").setup({
         {
             dir = "./",
             config = function ()
-                require("orphans").setup()
+                require("orphans").setup({
+                        debug = true
+                })
             end
         },
     },

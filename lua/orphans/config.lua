@@ -10,6 +10,7 @@ C.defaults = {
     },
     filetype = "orphans",       -- the filetype for the floating window
     analyzing_timeout = 2000,   -- the timeout for the analysis for each plugin in ms
+    ignored = {},
     debug = false,
 }
 
@@ -49,6 +50,10 @@ C.setup = function(opts)
     -- put only `orphans.debug` in `_G`
     _G.orphans = {}
     _G.orphans.debug = options.debug
+    -- sort the ignored list
+    table.sort(options.ignored, function(a, b)
+        return a > b
+    end)
     return options
 end
 

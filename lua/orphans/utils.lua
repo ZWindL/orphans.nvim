@@ -67,4 +67,22 @@ M.format_delta = function (time)
     end
 end
 
+-- compare function takes 2 elements and returns -1, 0, 1
+-- for less than, equal to, greater than
+M.bin_search = function (arr, target, compare_f)
+    local left = 1
+    local right = #arr
+    while left <= right do
+        local mid = math.floor((left + right) / 2)
+        if compare_f(arr[mid], target) < 0 then
+            left = mid + 1
+        elseif compare_f(arr[mid], target) > 0 then
+            right = mid - 1
+        else
+            return mid
+        end
+    end
+    return nil
+end
+
 return M

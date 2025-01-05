@@ -20,7 +20,10 @@ require("lazy").setup({
             dir = "./",
             config = function ()
                 require("orphans").setup({
-                        debug = true
+                    ignored = {
+                        "lazy.nvim",
+                    },
+                    debug = false,
                 })
             end
         },

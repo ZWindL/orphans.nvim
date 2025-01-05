@@ -2,8 +2,7 @@ local Git = require("orphans.git")
 local Utils = require("orphans.utils")
 local api = vim.api
 
-local P = {
-}
+local P = {}
 
 function P.all_possible_plugin_dirs()
     -- pugins are located at `vim.opt.rtp`
@@ -24,6 +23,20 @@ function P.sort_by_name(plugins)
     end)
 end
 
+function P.is_ignored(plugin_name, opts)
+    local ignore_list_sorted = opts.ignored
+    local matched = Utils.bin_search(ignore_list_sorted, plugin_name, function(a, b)
+        if a > b then
+            return 1
+        elseif a < b then
+            return -1
+        else
+            return 0
+        end
+    end)
+    return matched ~= nil
+end
+
 -- cache
 -- serialize to json
 
@@ -40,10 +53,11 @@ P.is_plugin = function(path)
         )
 end
 
-P.new_plugin = function()
+P.new_plugin = function(path)
+    local name = vim.fn.fnamemodify(path, ":t")
     return {
-        path = "",
-        name = "",
+        path = path,
+        name = name,
         last_commit_time = 0,
         last_commit_time_str = "",
         last_commit_time_delta = "",
@@ -53,7 +67,14 @@ P.new_plugin = function()
 end
 
 P.new_plugin_async = function(path, opts, callback)
-    local plugin = P.new_plugin()
+    local plugin = P.new_plugin(path)
+    if P.is_ignored(plugin.name, opts) then
+        Utils.log.debug(string.format("ignoring %s", plugin.name))
+        vim.schedule(function()
+            callback(nil)
+        end)
+        return
+    end
     Git.last_commit_info_async(path, function(info)
         Utils.log.debug(string.format("last commit info for %s: %s", path, info))
         if info == nil then
@@ -63,8 +84,6 @@ P.new_plugin_async = function(path, opts, callback)
             end)
             return
         end
-        plugin.path = path
-        plugin.name = vim.fn.fnamemodify(path, ":t")
         Utils.log.debug(string.format("analyzing %s: %s", plugin.name, path))
         -- split info by newline, first line is timestamp, second line is commit message
         local t = info:match("^(%d+)\n")

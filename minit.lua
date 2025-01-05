@@ -1,5 +1,6 @@
 local lazypath = "./build/lazy/lazy.nvim"
 vim.opt.rtp:prepend(lazypath)
+vim.opt.rtp:prepend("/home/zwindl/test/matrix")
 
 -- install lazy if it doesn't exist
 if not vim.loop.fs_stat(lazypath) then
@@ -18,7 +19,12 @@ require("lazy").setup({
         {
             dir = "./",
             config = function ()
-                require("orphans").setup()
+                require("orphans").setup({
+                    ignored = {
+                        "lazy.nvim",
+                    },
+                    debug = false,
+                })
             end
         },
     },

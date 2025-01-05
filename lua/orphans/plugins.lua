@@ -1,8 +1,8 @@
 local Git = require("orphans.git")
+local Utils = require("orphans.utils")
 local api = vim.api
 
-local P = {
-}
+local P = {}
 
 function P.all_possible_plugin_dirs()
     -- pugins are located at `vim.opt.rtp`
@@ -23,6 +23,20 @@ function P.sort_by_name(plugins)
     end)
 end
 
+function P.is_ignored(plugin_name, opts)
+    local ignore_list_sorted = opts.ignored
+    local matched = Utils.bin_search(ignore_list_sorted, plugin_name, function(a, b)
+        if a > b then
+            return 1
+        elseif a < b then
+            return -1
+        else
+            return 0
+        end
+    end)
+    return matched ~= nil
+end
+
 -- cache
 -- serialize to json
 
@@ -39,34 +53,11 @@ P.is_plugin = function(path)
         )
 end
 
--- Return a semantic string for a time delta.
--- e.g. "1 day ago", "2 hours ago", "over a year" etc.
-local function format_delta(time)
-    local delta = os.difftime(os.time(), time)
-    if delta < 60 then
-        return "just now"
-    elseif delta < 60 * 60 then
-        local minutes = math.floor(delta / 60)
-        return minutes .. " minute" .. (minutes ~= 1 and "s" or "") .. " ago"
-    elseif delta < 60 * 60 * 24 then
-        local hours = math.floor(delta / (60 * 60))
-        return hours .. " hour" .. (hours ~= 1 and "s" or "") .. " ago"
-    elseif delta < 60 * 60 * 24 * 30 then
-        local days = math.floor(delta / (60 * 60 * 24))
-        return days .. " day" .. (days ~= 1 and "s" or "") .. " ago"
-    elseif delta < 60 * 60 * 24 * 365 then
-       local months = math.floor(delta / (60 * 60 * 24 * 30))
-       return months .. " month" .. (months ~= 1 and "s" or "") .. " ago"
-    else
-        local years = math.floor(delta / (60 * 60 * 24 * 365))
-        return years .. " year" .. (years ~= 1 and "s" or "") .. " ago"
-    end
-end
-
-P.new_plugin = function()
+P.new_plugin = function(path)
+    local name = vim.fn.fnamemodify(path, ":t")
     return {
-        path = "",
-        name = "",
+        path = path,
+        name = name,
         last_commit_time = 0,
         last_commit_time_str = "",
         last_commit_time_delta = "",
@@ -76,18 +67,32 @@ P.new_plugin = function()
 end
 
 P.new_plugin_async = function(path, opts, callback)
-    local plugin = P.new_plugin()
+    local plugin = P.new_plugin(path)
+    if P.is_ignored(plugin.name, opts) then
+        Utils.log.debug(string.format("ignoring %s", plugin.name))
+        vim.schedule(function()
+            callback(nil)
+        end)
+        return
+    end
     Git.last_commit_info_async(path, function(info)
+        Utils.log.debug(string.format("last commit info for %s: %s", path, info))
+        if info == nil then
+            Utils.log.debug("failed to get last commit info for " .. path .. ", calling cb with nil")
+            vim.schedule(function()
+                callback(nil)
+            end)
+            return
+        end
+        Utils.log.debug(string.format("analyzing %s: %s", plugin.name, path))
         -- split info by newline, first line is timestamp, second line is commit message
         local t = info:match("^(%d+)\n")
         -- the rest is the commit message, trim the newline
         local msg = info:match("\n(.*)"):gsub("\n", " ")
         t = tonumber(t)
-        plugin.path = path
-        plugin.name = vim.fn.fnamemodify(path, ":t")
         plugin.last_commit_time = t
         plugin.last_commit_time_str = os.date(opts.ui.date_format, t)
-        plugin.last_commit_time_delta = format_delta(t)
+        plugin.last_commit_time_delta = Utils.format_delta(t)
         plugin.last_commit_msg = msg
         vim.schedule(function()
             callback(plugin)

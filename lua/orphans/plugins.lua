@@ -40,30 +40,6 @@ P.is_plugin = function(path)
         )
 end
 
--- Return a semantic string for a time delta.
--- e.g. "1 day ago", "2 hours ago", "over a year" etc.
-local function format_delta(time)
-    local delta = os.difftime(os.time(), time)
-    if delta < 60 then
-        return "just now"
-    elseif delta < 60 * 60 then
-        local minutes = math.floor(delta / 60)
-        return minutes .. " minute" .. (minutes ~= 1 and "s" or "") .. " ago"
-    elseif delta < 60 * 60 * 24 then
-        local hours = math.floor(delta / (60 * 60))
-        return hours .. " hour" .. (hours ~= 1 and "s" or "") .. " ago"
-    elseif delta < 60 * 60 * 24 * 30 then
-        local days = math.floor(delta / (60 * 60 * 24))
-        return days .. " day" .. (days ~= 1 and "s" or "") .. " ago"
-    elseif delta < 60 * 60 * 24 * 365 then
-       local months = math.floor(delta / (60 * 60 * 24 * 30))
-       return months .. " month" .. (months ~= 1 and "s" or "") .. " ago"
-    else
-        local years = math.floor(delta / (60 * 60 * 24 * 365))
-        return years .. " year" .. (years ~= 1 and "s" or "") .. " ago"
-    end
-end
-
 P.new_plugin = function()
     return {
         path = "",
@@ -97,7 +73,7 @@ P.new_plugin_async = function(path, opts, callback)
         t = tonumber(t)
         plugin.last_commit_time = t
         plugin.last_commit_time_str = os.date(opts.ui.date_format, t)
-        plugin.last_commit_time_delta = format_delta(t)
+        plugin.last_commit_time_delta = Utils.format_delta(t)
         plugin.last_commit_msg = msg
         vim.schedule(function()
             callback(plugin)

@@ -43,4 +43,28 @@ M.table_concat = function (t1, t2)
     return t
 end
 
+-- Return a semantic string for a time delta.
+-- e.g. "1 day ago", "2 hours ago", "over a year" etc.
+M.format_delta = function (time)
+    local delta = os.difftime(os.time(), time)
+    if delta < 60 then
+        return "just now"
+    elseif delta < 60 * 60 then
+        local minutes = math.floor(delta / 60)
+        return minutes .. " minute" .. (minutes ~= 1 and "s" or "") .. " ago"
+    elseif delta < 60 * 60 * 24 then
+        local hours = math.floor(delta / (60 * 60))
+        return hours .. " hour" .. (hours ~= 1 and "s" or "") .. " ago"
+    elseif delta < 60 * 60 * 24 * 30 then
+        local days = math.floor(delta / (60 * 60 * 24))
+        return days .. " day" .. (days ~= 1 and "s" or "") .. " ago"
+    elseif delta < 60 * 60 * 24 * 365 then
+       local months = math.floor(delta / (60 * 60 * 24 * 30))
+       return months .. " month" .. (months ~= 1 and "s" or "") .. " ago"
+    else
+        local years = math.floor(delta / (60 * 60 * 24 * 365))
+        return years .. " year" .. (years ~= 1 and "s" or "") .. " ago"
+    end
+end
+
 return M
